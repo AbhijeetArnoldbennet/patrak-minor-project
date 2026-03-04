@@ -273,55 +273,108 @@
   <div id="toast"></div>
 
   <script>
-    let patientCounter = 1;
-    let visitCounter = 1;
-    let tokenCounter = 100;
+let visitCounter = 1;
+let tokenCounter = 100;
 
-    const patients = [];
-    const visitTableBody = document.getElementById("visitTableBody");
-    const toast = document.getElementById("toast");
+const visitTableBody = document.getElementById("visitTableBody");
+const toast = document.getElementById("toast");
 
-    function showToast(msg) {
-      toast.innerText = msg;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3000);
-    }
+function showToast(msg) {
+  toast.innerText = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
 
-    document.getElementById("patientForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const pid = "P" + patientCounter++;
-      patients.push(pid);
-      document.getElementById("visitPatientId").value = pid;
-      showToast(`Patient Registered: ${pid}`);
-      e.target.reset();
+
+// PATIENT REGISTRATION
+
+
+document.getElementById("patientForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const fullName = document.getElementById("fullName").value;
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
+  const phone = document.getElementById("phone").value;
+
+  try {
+
+    const response = await fetch("http://localhost:5000/api/patients/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fullName: fullName,
+        age: age,
+        gender: gender,
+        phone: phone
+      })
     });
 
-    document.getElementById("visitForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const pid = visitPatientId.value;
+    const data = await response.json();
 
-      if (!patients.includes(pid)) {
-        showToast("Patient not found!");
-        return;
-      }
+    if(response.ok){
+      showToast("Patient Registered Successfully");
 
-      const vid = "V" + visitCounter++;
-      const token = "T" + tokenCounter++;
-      const date = visitDate.value;
-      const time = visitTime.value;
-      const doctor = document.getElementById("doctor").value || "N/A";
-      const status = "Waiting";
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${vid}</td>
-        <td>${pid}</td>
-        <td>${date}</td>
-        <td>${time}</td>
-        <td>${token}</td>
-        <td>${doctor}</td>
-        <td><span class="badge waiting">${status}</span></td>
-      `;        
 
-      visitTableBody.appendChild(row);
-      showToast(`Visit Logged: ${vid} for Patient ${pid}`);     
-      e.target.reset();
+      document.getElementById("visitPatientId").value = data.patient._id;
+
+      document.getElementById("patientForm").reset();
+    }
+    else{
+      showToast(data.message || "Registration failed");
+    }
+
+  } catch (error) {
+    console.error(error);
+    showToast("Server connection error");
+  }
+
+});
+
+
+
+// VISIT LOGGING
+
+
+document.getElementById("visitForm").addEventListener("submit", function(e) {
+
+  e.preventDefault();
+
+  const pid = document.getElementById("visitPatientId").value;
+
+  if(!pid){
+    showToast("Please enter Patient ID");
+    return;
+  }
+
+  const vid = "V" + visitCounter++;
+  const token = "T" + tokenCounter++;
+
+  const date = document.getElementById("visitDate").value;
+  const time = document.getElementById("visitTime").value;
+  const doctor = document.getElementById("doctor").value || "N/A";
+
+  const status = "Waiting";
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${vid}</td>
+    <td>${pid}</td>
+    <td>${date}</td>
+    <td>${time}</td>
+    <td>${token}</td>
+    <td>${doctor}</td>
+    <td><span class="badge waiting">${status}</span></td>
+  `;
+
+  visitTableBody.appendChild(row);
+
+  showToast(`Visit Logged: ${vid}`);
+
+  document.getElementById("visitForm").reset();
+
+});
+</script>
