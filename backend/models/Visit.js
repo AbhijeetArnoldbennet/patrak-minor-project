@@ -23,6 +23,12 @@ const visitSchema = new mongoose.Schema({
     default: "N/A"
   },
 
+  visitType:{
+    type:String,
+    enum:["New","Follow-up"],
+    default:"New"
+  },
+  
   tokenNumber: {
     type: Number,
     default: null

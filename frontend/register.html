@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PATRAK - Registration Form</title>
+
+<style>
+
+*{box-sizing:border-box;}
+
+body{
+font-family:'Segoe UI',Arial,sans-serif;
+margin:0;
+background:#A7EBF2;
+color:#023859;
+}
+
+header{
+background:linear-gradient(135deg,#023859,#54ACBF);
+color:white;
+padding:40px 20px;
+text-align:center;
+}
+
+.services{
+display:flex;
+justify-content:space-around;
+flex-wrap:wrap;
+background:#54ACBF;
+color:white;
+padding:30px 10px;
+}
+
+.service-box{
+flex:1 1 200px;
+margin:10px;
+padding:20px;
+background:#26658C;
+border-radius:12px;
+text-align:center;
+}
+
+.card{
+background:white;
+margin:30px auto;
+padding:25px;
+border-radius:12px;
+max-width:900px;
+box-shadow:0 6px 12px rgba(0,0,0,0.1);
+}
+
+.form-group{
+margin-bottom:12px;
+}
+
+input,select{
+width:100%;
+padding:8px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+button{
+background:#54ACBF;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#26658C;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#54ACBF;
+color:white;
+}
+
+.badge{
+padding:5px 12px;
+border-radius:20px;
+color:white;
+font-size:0.85em;
+font-weight:bold;
+}
+
+.waiting{background:#f39c12;}
+
+#toast{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#011C40;
+color:white;
+padding:12px 20px;
+border-radius:8px;
+opacity:0;
+transition:all .4s ease;
+}
+
+#toast.show{
+opacity:1;
+transform:translateY(-10px);
+}
+
+#searchResults{
+border:1px solid #ddd;
+border-radius:6px;
+margin-top:5px;
+background:white;
+}
+
+.search-option{
+padding:8px;
+cursor:pointer;
+border-bottom:1px solid #eee;
+}
+
+.search-option:hover{
+background:#f3f3f3;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>PATRAK</h1>
+<p>Smart Patient Token & Visit Logging System</p>
+</header>
+
+<section class="services">
+<div class="service-box">
+<h3>🆘 Emergency Cases</h3>
+<p>Immediate care for urgent medical needs.</p>
+</div>
+
+<div class="service-box">
+<h3>👨‍⚕️ Qualified Doctors</h3>
+<p>Experienced professionals across specialties.</p>
+</div>
+
+<div class="service-box">
+<h3>📞 24/7 Support</h3>
+<p>Round-the-clock assistance for patients.</p>
+</div>
+
+<div class="service-box">
+<h3>💻 Online Appointment</h3>
+<p>Book consultations anytime.</p>
+</div>
+</section>
+
+
+<!-- SEARCH PATIENT -->
+
+<section class="card">
+
+<h2>🔎 Search Patient</h2>
+
+<div class="form-group">
+<label>Search by Name or Phone</label>
+<input type="text" id="patientSearch" placeholder="Enter name or phone">
+</div>
+
+<div id="searchResults"></div>
+
+</section>
+
+
+<!-- PATIENT REGISTRATION -->
+
+<section class="card">
+
+<h2>🧑‍⚕️ Patient Registration</h2>
+
+<form id="patientForm">
+
+<div class="form-group">
+<label>Full Name</label>
+<input type="text" id="fullName" required minlength="3" maxlength="50">
+</div>
+
+<div class="form-group">
+<label>Age</label>
+<input type="number" id="age" required min="0" max="120">
+</div>
+
+<div class="form-group">
+<label>Gender</label>
+<select id="gender">
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Phone</label>
+<input type="tel" id="phone" required pattern="[0-9]{10}" maxlength="10">
+</div>
+
+<button type="submit">Register Patient</button>
+
+</form>
+
+</section>
+
+
+<!-- VISIT FORM -->
+
+<section class="card">
+
+<h2>📋 Visit / Consultation</h2>
+
+<form id="visitForm">
+
+<div class="form-group">
+<label>Date</label>
+<input type="date" id="visitDate" required>
+</div>
+
+<div class="form-group">
+<label>Time</label>
+<input type="time" id="visitTime" required>
+</div>
+
+<div class="form-group">
+<label>Doctor</label>
+<input type="text" id="doctor">
+</div>
+
+<div class="form-group">
+<label>Visit Type</label>
+<select id="visitType">
+<option value="New">New</option>
+<option value="Follow-up">Follow-up</option>
+</select>
+</div>
+
+<button type="submit">Log Visit</button>
+
+</form>
+
+</section>
+
+
+<!-- VISIT LOG -->
+
+<section class="card">
+
+<h2>📑 Visit Log</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Visit ID</th>
+<th>Patient ID</th>
+<th>Date</th>
+<th>Time</th>
+<th>Token</th>
+<th>Doctor</th>
+<th>Visit Type</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="visitTableBody"></tbody>
+
+</table>
+
+</section>
+
+<footer>
+© 2026 PATRAK | Smart Clinic System
+</footer>
+
+<div id="toast"></div>
+
+
+<script>
+
+let currentPatientId=null;
+let currentPatientName="";
+let currentPatientPhone="";
+
+const searchInput=document.getElementById("patientSearch");
+const searchResults=document.getElementById("searchResults");
+const visitTableBody=document.getElementById("visitTableBody");
+const toast=document.getElementById("toast");
+
+/* LOAD TODAY VISITS WHEN PAGE OPENS */
+
+window.addEventListener("load", async function(){
+
+const res = await fetch("http://localhost:5000/api/visits/today");
+const visits = await res.json();
+
+const today = new Date().toISOString().split("T")[0];
+
+visits.forEach(visit => {
+if(visit.visitDate !== today){
+return;
+}
+const row=document.createElement("tr");
+
+let token="Pending";
+
+if(visit.visitDate===today && visit.tokenNumber!==null){
+token="T"+visit.tokenNumber;
+}
+
+row.innerHTML=`
+
+<td>${visit._id}</td>
+<td>${visit.patientId.fullName} (${visit.patientId.phone})</td>
+<td>${visit.visitDate}</td>
+<td>${visit.visitTime}</td>
+<td>${token}</td>
+<td>${visit.doctor}</td>
+<td>${visit.visitType}</td>
+
+<td>
+<select class="statusSelect">
+<option value="Waiting">Waiting</option>
+<option value="In Progress">In Progress</option>
+<option value="Done">Done</option>
+</select>
+</td>
+
+`;
+visitTableBody.appendChild(row);
+const statusSelect = row.querySelector(".statusSelect");
+
+statusSelect.value = visit.status;
+if(visit.status==="Waiting") statusSelect.style.background="#f39c12";
+if(visit.status==="In Progress") statusSelect.style.background="#8e44ad";
+if(visit.status==="Done") statusSelect.style.background="#27ae60";
+
+statusSelect.addEventListener("change", async function(){
+
+const newStatus = this.value;
+
+try{
+
+await fetch(`http://localhost:5000/api/visits/${visit._id}/status`,{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+status:newStatus
+})
+});
+
+}catch(error){
+console.error("Status update error:",error);
+}
+if(newStatus==="Waiting"){
+this.style.background="#f39c12";
+}
+
+if(newStatus==="In Progress"){
+this.style.background="#8e44ad";
+}
+
+if(newStatus==="Done"){
+
+this.style.background="#27ae60";
+
+const nextRow = this.closest("tr").nextElementSibling;
+
+if(nextRow){
+
+const nextToken = nextRow.children[4].innerText;
+
+showToast("Next Patient Token : " + nextToken);
+
+}
+
+}
+
+});
+
+});
+
+});
+function showToast(msg){
+
+toast.innerText=msg;
+toast.classList.add("show");
+
+setTimeout(()=>toast.classList.remove("show"),3000);
+
+}
+
+
+/* SEARCH PATIENT */
+
+searchInput.addEventListener("input",async function(){
+
+const query=this.value;
+
+if(query.length<2){
+
+searchResults.innerHTML="";
+return;
+
+}
+
+const res=await fetch(`http://localhost:5000/api/patients/search?query=${query}`);
+const patients=await res.json();
+
+searchResults.innerHTML="";
+
+if(patients.length===0){
+
+searchResults.innerHTML=`
+<div class="search-option" id="registerNewPatient">
+No patient found. Click here to register new patient
+</div>
+`;
+
+const option=document.getElementById("registerNewPatient");
+
+option.onclick=()=>{
+
+const query=searchInput.value;
+
+// autofill phone if numbers were searched
+if(/^[0-9]+$/.test(query)){
+document.getElementById("phone").value=query;
+}
+
+// scroll to registration form
+document.getElementById("fullName").scrollIntoView({
+behavior:"smooth"
+});
+
+// focus name field
+document.getElementById("fullName").focus();
+
+showToast("Register new patient");
+
+};
+
+return;
+
+}
+
+patients.forEach(p=>{
+
+const div=document.createElement("div");
+
+div.className="search-option";
+
+div.innerText=`${p.fullName} — ${p.phone} — Age ${p.age}`;
+
+div.onclick=()=>{
+
+document.getElementById("fullName").value=p.fullName;
+document.getElementById("age").value=p.age;
+document.getElementById("gender").value=p.gender;
+document.getElementById("phone").value=p.phone;
+
+currentPatientId=p._id;
+currentPatientName = p.fullName;
+currentPatientPhone = p.phone;
+
+searchResults.innerHTML="";
+
+showToast("Patient selected");
+
+};
+
+searchResults.appendChild(div);
+
+});
+
+});
+
+
+/* REGISTER PATIENT */
+
+document.getElementById("patientForm").addEventListener("submit",async function(e){
+
+e.preventDefault();
+
+const fullName=document.getElementById("fullName").value;
+const age=document.getElementById("age").value;
+const gender=document.getElementById("gender").value;
+const phone=document.getElementById("phone").value;
+
+if(fullName.length < 3){
+showToast("Name must be at least 3 characters");
+return;
+}
+
+if(age < 0 || age > 120){
+showToast("Enter valid age");
+return;
+}
+
+if(!/^[0-9]{10}$/.test(phone)){
+showToast("Phone must be 10 digits");
+return;
+}
+
+const res=await fetch("http://localhost:5000/api/patients/register",{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+
+body:JSON.stringify({
+fullName,age,gender,phone
+})
+
+});
+
+const data = await res.json();
+
+if(!res.ok){
+showToast(data.message);
+return;
+}
+
+currentPatientId = data.patient._id;
+currentPatientName = fullName;
+currentPatientPhone = phone;
+
+showToast("Patient registered successfully");
+
+// reset registration form
+document.getElementById("patientForm").reset();
+
+// clear search field
+searchInput.value = "";
+searchResults.innerHTML = "";
+
+// move to visit form
+document.getElementById("visitDate").scrollIntoView({
+behavior:"smooth"
+});
+});
+/* CREATE VISIT */
+
+document.getElementById("visitForm").addEventListener("submit",async function(e){
+
+e.preventDefault();
+
+if(!currentPatientId){
+
+showToast("Select or register patient first");
+return;
+
+}
+
+const visitDate=document.getElementById("visitDate").value;
+const visitTime=document.getElementById("visitTime").value;
+const doctor=document.getElementById("doctor").value;
+const visitType=document.getElementById("visitType").value;
+
+const res=await fetch("http://localhost:5000/api/visits",{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+
+body:JSON.stringify({
+patientId:currentPatientId,
+visitDate,
+visitTime,
+doctor,
+visitType
+})
+
+});
+
+const data=await res.json();
+
+const visit=data.visit;
+
+const row=document.createElement("tr");
+
+const today = new Date().toISOString().split("T")[0];
+
+let token = "Pending";
+
+if(visit.visitDate === today && visit.tokenNumber !== null){
+token = "T" + visit.tokenNumber;
+}
+
+row.innerHTML=`
+
+<td>${visit._id}</td>
+<td>${currentPatientName} (${currentPatientPhone})</td>
+<td>${visit.visitDate}</td>
+<td>${visit.visitTime}</td>
+<td>${token}</td>
+<td>${visit.doctor}</td>
+<td>${visit.visitType}</td>
+
+
+<td>
+<select class="statusSelect">
+<option value="Waiting">Waiting</option>
+<option value="In Progress">In Progress</option>
+<option value="Done">Done</option>
+</select>
+</td>
+
+`;
+visitTableBody.appendChild(row);
+const statusSelect=row.querySelector(".statusSelect");
+statusSelect.style.background="#f39c12";
+
+statusSelect.addEventListener("change", async function(){
+
+const newStatus = this.value;
+
+// 🔹 Update status in MongoDB
+try{
+
+await fetch(`http://localhost:5000/api/visits/${visit._id}/status`,{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+status:newStatus
+})
+
+});
+
+}catch(error){
+console.error("Status update error:",error);
+}
+
+
+// 🔹 UI Color Change
+
+if(newStatus==="Waiting"){
+this.style.background="#f39c12";
+}
+
+if(newStatus==="In Progress"){
+this.style.background="#8e44ad";
+}
+
+if(newStatus==="Done"){
+
+this.style.background="#27ae60";
+
+const nextRow = this.closest("tr").nextElementSibling;
+
+if(nextRow){
+
+const nextToken = nextRow.children[4].innerText;
+
+showToast("Next Patient Token : " + nextToken);
+
+}
+
+}
+
+});
+showToast("Patient added to queue");
+
+document.getElementById("visitForm").reset();
+
+// reset selected patient
+currentPatientId = null;
+currentPatientName = "";
+currentPatientPhone = "";
+
+// clear registration fields
+document.getElementById("patientForm").reset();
+searchInput.value="";
+searchResults.innerHTML="";
+
+});
+
+</script>
+
+</body>
+</html>

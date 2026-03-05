@@ -11,6 +11,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static("frontend"));
+
 // Connect to MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/patrakDB")
   .then(() => console.log("MongoDB Connected Successfully"))
@@ -22,7 +24,7 @@ app.get("/", (req, res) => {
 });
 
 // Register Patient API
-// Register Patient API
+
 app.post("/api/patients/register", async (req, res) => {
 
   try {
@@ -88,10 +90,15 @@ app.post("/api/visits", async (req, res) => {
 
   try {
 
-    const { patientId, visitDate, visitTime, doctor } = req.body;
+    const { patientId, visitDate, visitTime, doctor, visitType } = req.body;
 
     const today = new Date().toISOString().split("T")[0];
 
+    if (!["New","Follow-up"].includes(visitType)) {
+  return res.status(400).json({
+    message: "Invalid visit type"
+  });
+}
     let tokenNumber = null;
 
     // Generate token immediately if visit is today
@@ -111,6 +118,7 @@ app.post("/api/visits", async (req, res) => {
       visitDate,
       visitTime,
       doctor,
+      visitType,
       tokenNumber
     });
 
@@ -227,6 +235,55 @@ app.get("/api/patients/search", async (req, res) => {
 
     res.status(500).json({
       message: "Error searching patients",
+      error: error.message
+    });
+
+  }
+
+});
+
+// Get patient visit history
+app.get("/api/patients/:id/history", async (req, res) => {
+
+  try {
+
+    const patientId = req.params.id;
+
+    const visits = await Visit.find({ patientId })
+      .sort({ visitDate: -1 });
+
+    res.json(visits);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Error fetching patient history",
+      error: error.message
+    });
+
+  }
+
+});
+
+//live token
+app.get("/api/live-token", async (req, res) => {
+
+  try {
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const visits = await Visit.find({
+      visitDate: today
+    })
+    .populate("patientId")
+    .sort({ tokenNumber: 1 });
+
+    res.json(visits);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Error fetching live tokens",
       error: error.message
     });
 

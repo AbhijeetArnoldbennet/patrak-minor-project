@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PATRAK - Patient History</title>
+
+<style>
+
+*{box-sizing:border-box;}
+
+body{
+font-family:'Segoe UI',Arial,sans-serif;
+margin:0;
+background:#A7EBF2;
+color:#023859;
+}
+
+header{
+background:linear-gradient(135deg,#023859,#54ACBF);
+color:white;
+padding:40px 20px;
+text-align:center;
+}
+
+.card{
+background:white;
+margin:30px auto;
+padding:25px;
+border-radius:12px;
+max-width:900px;
+box-shadow:0 6px 12px rgba(0,0,0,0.1);
+}
+
+.search-box{
+margin-bottom:20px;
+}
+
+#searchInput{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+#searchResults{
+border:1px solid #ddd;
+border-radius:6px;
+margin-top:5px;
+background:white;
+}
+
+.search-option{
+padding:8px;
+cursor:pointer;
+border-bottom:1px solid #eee;
+}
+
+.search-option:hover{
+background:#f3f3f3;
+}
+
+.patient-info{
+margin-top:20px;
+padding:15px;
+background:#f5fbfd;
+border-radius:8px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#54ACBF;
+color:white;
+}
+
+footer{
+background:#011C40;
+color:#A7EBF2;
+text-align:center;
+padding:20px;
+margin-top:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>PATRAK</h1>
+<p>Patient History & Visit Records</p>
+</header>
+
+<section class="card">
+
+<h2>Search Patient</h2>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Enter patient name or phone">
+</div>
+
+<div id="searchResults"></div>
+
+<div class="patient-info">
+
+<h3>Patient Details</h3>
+
+<p><strong>Name:</strong> <span id="pname">-</span></p>
+<p><strong>Age:</strong> <span id="page">-</span></p>
+<p><strong>Gender:</strong> <span id="pgender">-</span></p>
+<p><strong>Phone:</strong> <span id="pphone">-</span></p>
+
+</div>
+
+<h3>Visit History</h3>
+
+<table>
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Time</th>
+<th>Doctor</th>
+<th>Visit Type</th>
+<th>Token</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="historyTable"></tbody>
+
+</table>
+
+</section>
+
+<footer>
+© 2026 PATRAK | Smart Clinic System
+</footer>
+
+<script>
+
+const searchInput = document.getElementById("searchInput");
+const searchResults = document.getElementById("searchResults");
+const historyTable = document.getElementById("historyTable");
+
+/* SEARCH PATIENT */
+
+searchInput.addEventListener("input", async function(){
+
+const query = this.value;
+
+if(query.length < 2){
+searchResults.innerHTML = "";
+return;
+}
+
+const res = await fetch(`http://localhost:5000/api/patients/search?query=${query}`);
+const patients = await res.json();
+
+searchResults.innerHTML = "";
+
+patients.forEach(p => {
+
+const div = document.createElement("div");
+
+div.className = "search-option";
+
+div.innerText = `${p.fullName} — ${p.phone} — Age ${p.age}`;
+
+div.onclick = () => {
+
+document.getElementById("pname").innerText = p.fullName;
+document.getElementById("page").innerText = p.age;
+document.getElementById("pgender").innerText = p.gender;
+document.getElementById("pphone").innerText = p.phone;
+
+searchResults.innerHTML = "";
+
+loadHistory(p._id);
+
+};
+
+searchResults.appendChild(div);
+
+});
+
+});
+
+
+/* LOAD VISIT HISTORY */
+
+async function loadHistory(patientId){
+
+const res = await fetch(`http://localhost:5000/api/patients/${patientId}/history`);
+
+const visits = await res.json();
+
+historyTable.innerHTML = "";
+
+visits.forEach(v => {
+
+let token = v.tokenNumber ? "T" + v.tokenNumber : "Pending";
+
+const row = document.createElement("tr");
+
+row.innerHTML = `
+
+<td>${v.visitDate}</td>
+<td>${v.visitTime}</td>
+<td>${v.doctor}</td>
+<td>${v.visitType || "New"}</td>
+<td>${token}</td>
+<td>${v.status}</td>
+
+`;
+
+historyTable.appendChild(row);
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
