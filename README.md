@@ -23,6 +23,11 @@ Features:
 • Queue status updates
 • MongoDB database integration
 
+Has a startup page which will redirect you to:
+1. Registration page
+2. History page
+3. Live Token page
+
 Tech Stack:
 Frontend: HTML, CSS, JavaScript
 Backend: Node.js, Express
